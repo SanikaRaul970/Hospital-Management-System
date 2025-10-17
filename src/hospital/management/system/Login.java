@@ -106,7 +106,7 @@ public class Login extends JFrame implements ActionListener {
 
                 if (rs.next()) {
                     JOptionPane.showMessageDialog(this, "Login Successful!");
-                    new test();
+                    new Reception();
                     setVisible(false);
                 } else {
                     JOptionPane.showMessageDialog(this, "Invalid Credentials", "Error", JOptionPane.ERROR_MESSAGE);
