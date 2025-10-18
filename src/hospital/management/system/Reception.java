@@ -36,6 +36,8 @@ public class Reception extends JFrame {
         ambulanceImage.setBounds(1220, 25, 200, 100);
         headerPanel.add(ambulanceImage);
 
+
+
         // ===== MAIN PANEL =====
         JPanel mainPanel = new JPanel(null);
         mainPanel.setBounds(0, 150, 1455, 618);
@@ -96,6 +98,48 @@ public class Reception extends JFrame {
                     btn.setBackground(new Color(42, 157, 143));
                 }
             });
+
+            btn.addActionListener(e -> {
+                String btnText = btn.getText();
+
+                switch (btnText) {
+                    case "Add Patient":
+                        new NEW_PATIENT();
+                        setVisible(false);
+                        break;
+
+                    case "View Patients":
+                    case "Patient Info":   // Both open the same patient view
+                        new View_Patient();
+                        setVisible(false);
+                        break;
+
+                    case "Update Patient Info":
+                        new Update_Patient(); // You need to create this class
+                        setVisible(false);
+                        break;
+
+                    case "Billing":
+                        new BillingWindow();
+                        setVisible(false);
+                        break;
+
+                    case "Check Room Availability":
+                        new View_Room();
+                        setVisible(false);
+                        break;
+
+                    case "Logout":
+                        dispose();
+                        JOptionPane.showMessageDialog(null, "Logged out successfully!");
+                        break;
+
+                    // Add other buttons here as needed
+                    default:
+                        JOptionPane.showMessageDialog(null, btnText + " is not implemented yet.");
+                }
+            });
+
 
             mainPanel.add(btn);
             count++;

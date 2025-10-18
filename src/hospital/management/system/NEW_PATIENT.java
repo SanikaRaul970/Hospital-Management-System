@@ -3,6 +3,7 @@ package hospital.management.system;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -46,9 +47,12 @@ public class NEW_PATIENT extends JFrame implements ActionListener {
         JPanel formPanel = new JPanel();
         formPanel.setLayout(null);
         formPanel.setBackground(Color.WHITE);
-        formPanel.setBounds(420, 100, 600, 400);
-        formPanel.setBorder(BorderFactory.createLineBorder(new Color(89, 131, 146), 2, true));
-        mainPanel.add(formPanel);
+
+        JScrollPane scrollPane = new JScrollPane(formPanel);
+        scrollPane.setBounds(420, 100, 600, 420);
+        scrollPane.setBorder(BorderFactory.createEmptyBorder());
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        mainPanel.add(scrollPane);
 
         int labelX = 50, fieldX = 220, y = 40, gap = 45;
 
@@ -61,11 +65,10 @@ public class NEW_PATIENT extends JFrame implements ActionListener {
         comboID = new JComboBox<>(new String[]{"Aadhar Card", "Voter ID", "Passport", "Driving License"});
         comboID.setBounds(fieldX, y, 300, 25);
         comboID.setBackground(new Color(236, 253, 245));
-        comboID.setFont(new Font("Segoe UI", Font.PLAIN, 15));
         formPanel.add(comboID);
         y += gap;
 
-        // Number
+        // ID Number
         JLabel lblNumber = new JLabel("ID Number");
         lblNumber.setFont(new Font("Segoe UI", Font.PLAIN, 16));
         lblNumber.setBounds(labelX, y, 150, 25);
@@ -118,11 +121,22 @@ public class NEW_PATIENT extends JFrame implements ActionListener {
         lblRoom.setBounds(labelX, y, 150, 25);
         formPanel.add(lblRoom);
 
-        comboRoom = new JComboBox<>(new String[]{"101", "102", "103", "201", "202", "203"});
+        comboRoom = new JComboBox<>();
         comboRoom.setBounds(fieldX, y, 300, 25);
         comboRoom.setBackground(new Color(236, 253, 245));
         formPanel.add(comboRoom);
         y += gap;
+
+        // Load available rooms from DB
+        try {
+            conn c = new conn();
+            ResultSet rs = c.statement.executeQuery("SELECT room_no FROM Room WHERE availability='Available'");
+            while (rs.next()) {
+                comboRoom.addItem(rs.getString("room_no"));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         // Time
         JLabel lblTimeText = new JLabel("Time");
@@ -130,13 +144,13 @@ public class NEW_PATIENT extends JFrame implements ActionListener {
         lblTimeText.setBounds(labelX, y, 150, 25);
         formPanel.add(lblTimeText);
 
-        lblTime = new JLabel(new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date()));
+        lblTime = new JLabel(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
         lblTime.setFont(new Font("Segoe UI", Font.PLAIN, 16));
         lblTime.setBounds(fieldX, y, 300, 25);
         formPanel.add(lblTime);
         y += gap;
 
-        // Mobile
+        // Mobile Number
         JLabel lblMobile = new JLabel("Mobile Number");
         lblMobile.setFont(new Font("Segoe UI", Font.PLAIN, 16));
         lblMobile.setBounds(labelX, y, 150, 25);
@@ -171,6 +185,11 @@ public class NEW_PATIENT extends JFrame implements ActionListener {
         styleButton(btnCancel);
         formPanel.add(btnCancel);
 
+        btnAdd.addActionListener(this);
+        btnCancel.addActionListener(this);
+
+        formPanel.setPreferredSize(new Dimension(580, y + 100));
+
         // ===== FRAME SETTINGS =====
         setTitle("Hospital Management System - New Patient");
         setSize(1455, 768);
@@ -202,7 +221,53 @@ public class NEW_PATIENT extends JFrame implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        // Future functionality for DB insertion will go here
+        if (e.getSource() == btnAdd) {
+            String idType = (String) comboID.getSelectedItem();
+            String number = txtNumber.getText();
+            String name = txtName.getText();
+            String gender = male.isSelected() ? "Male" : (female.isSelected() ? "Female" : "");
+            String room = (String) comboRoom.getSelectedItem();
+            String mobile = txtMobile.getText();
+            String deposit = txtDeposit.getText();
+
+            if (name.isEmpty() || number.isEmpty() || gender.isEmpty() || mobile.isEmpty() || deposit.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Please fill all fields!");
+                return;
+            }
+
+            try {
+                conn c = new conn();
+                String query = "INSERT INTO patient_info (ID, Number, Name, Gender, Room, Time, Mobile_Number, Deposit) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+                PreparedStatement pst = c.connection.prepareStatement(query);
+                pst.setString(1, idType);
+                pst.setString(2, number);
+                pst.setString(3, name);
+                pst.setString(4, gender);
+                pst.setString(5, room);
+                pst.setTimestamp(6, new java.sql.Timestamp(System.currentTimeMillis()));
+                pst.setString(7, mobile);
+                pst.setBigDecimal(8, new java.math.BigDecimal(deposit));
+                pst.executeUpdate();
+
+                // Update room availability
+                String updateRoom = "UPDATE Room SET availability='Occupied' WHERE room_no=?";
+                PreparedStatement pst2 = c.connection.prepareStatement(updateRoom);
+                pst2.setString(1, room);
+                pst2.executeUpdate();
+
+                JOptionPane.showMessageDialog(this, "✅ Patient added successfully!");
+                setVisible(false);
+                new Reception();
+
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(this, "❌ Error: " + ex.getMessage());
+            }
+
+        } else if (e.getSource() == btnCancel) {
+            setVisible(false);
+            new Reception();
+        }
     }
 
     public static void main(String[] args) {

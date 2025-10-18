@@ -3,18 +3,20 @@ package hospital.management.system;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
 public class Login extends JFrame implements ActionListener {
 
     JTextField usernameField;
     JPasswordField passwordField;
-    JButton loginButton, cancelButton;
+    JButton loginButton, cancelButton, registerButton;
 
-    Login() {
+    public Login() {
         setTitle("Hospital Management System - Login");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(500, 350);
+        setSize(500, 400);
         setLocationRelativeTo(null);
         setLayout(null);
 
@@ -22,14 +24,14 @@ public class Login extends JFrame implements ActionListener {
 
         JPanel loginPanel = new JPanel();
         loginPanel.setLayout(null);
-        loginPanel.setBounds(100, 60, 300, 220);
+        loginPanel.setBounds(100, 60, 300, 280);
         loginPanel.setBackground(Color.WHITE);
         loginPanel.setBorder(BorderFactory.createLineBorder(new Color(178, 223, 219), 2, true));
         add(loginPanel);
 
         JLabel title = new JLabel("User Login", SwingConstants.CENTER);
         title.setFont(new Font("Segoe UI", Font.BOLD, 20));
-        title.setForeground(new Color(0, 121, 107)); // dark teal
+        title.setForeground(new Color(0, 121, 107));
         title.setBounds(80, 10, 140, 30);
         loginPanel.add(title);
 
@@ -56,17 +58,23 @@ public class Login extends JFrame implements ActionListener {
         loginPanel.add(passwordField);
 
         loginButton = new JButton("Login");
-        loginButton.setBounds(40, 150, 100, 30);
+        loginButton.setBounds(30, 140, 90, 30);
         styleButton(loginButton);
         loginPanel.add(loginButton);
 
         cancelButton = new JButton("Cancel");
-        cancelButton.setBounds(160, 150, 100, 30);
+        cancelButton.setBounds(160, 140, 90, 30);
         styleButton(cancelButton);
         loginPanel.add(cancelButton);
 
+        registerButton = new JButton("Register");
+        registerButton.setBounds(95, 190, 100, 30);
+        styleButton(registerButton);
+        loginPanel.add(registerButton);
+
         loginButton.addActionListener(this);
         cancelButton.addActionListener(this);
+        registerButton.addActionListener(this);
 
         setVisible(true);
     }
@@ -101,16 +109,23 @@ public class Login extends JFrame implements ActionListener {
 
             try {
                 conn c = new conn();
-                String query = "SELECT * FROM login WHERE ID='" + user + "' AND pw='" + pass + "'";
-                ResultSet rs = c.statement.executeQuery(query);
+                String query = "SELECT * FROM login WHERE ID=? AND pw=?";
+                PreparedStatement pst = c.connection.prepareStatement(query);
+                pst.setString(1, user);
+                pst.setString(2, pass);
+                ResultSet rs = pst.executeQuery();
 
                 if (rs.next()) {
                     JOptionPane.showMessageDialog(this, "Login Successful!");
-                    new Reception();
+                    new Reception(); // Open Reception window
                     setVisible(false);
                 } else {
                     JOptionPane.showMessageDialog(this, "Invalid Credentials", "Error", JOptionPane.ERROR_MESSAGE);
                 }
+
+                rs.close();
+                pst.close();
+                c.connection.close();
 
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -118,6 +133,11 @@ public class Login extends JFrame implements ActionListener {
 
         } else if (e.getSource() == cancelButton) {
             System.exit(0);
+
+        } else if (e.getSource() == registerButton) {
+            // Open registration window
+            new Register(); // You need to create Register.java
+            setVisible(false);
         }
     }
 
