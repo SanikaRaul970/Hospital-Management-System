@@ -34,7 +34,17 @@ public class PATIENT_INFO extends JFrame implements ActionListener {
         add(mainPanel);
 
         // ===== TABLE =====
-        String[] columnNames = {"ID Type", "ID Number", "Full Name", "Gender", "Room", "Time", "Mobile Number", "Deposit"};
+        String[] columnNames = {
+                "Patient ID",
+                "ID Type",
+                "ID Number",
+                "Full Name",
+                "Gender",
+                "Room",
+                "Time",
+                "Mobile Number",
+                "Deposit"
+        };
         DefaultTableModel model = new DefaultTableModel(columnNames, 0);
         table = new JTable(model);
         table.setFont(new Font("Segoe UI", Font.PLAIN, 15));
@@ -75,14 +85,18 @@ public class PATIENT_INFO extends JFrame implements ActionListener {
         setVisible(true);
     }
 
+    // ✅ Load data from database
     private void loadPatientData(DefaultTableModel model) {
         model.setRowCount(0); // clear table before reloading
         try {
             conn c = new conn();
-            ResultSet rs = c.statement.executeQuery("SELECT * FROM patient_info");
+            String query = "SELECT * FROM patient_info";
+            ResultSet rs = c.statement.executeQuery(query);
+
             while (rs.next()) {
-                String id = rs.getString("ID");
-                String number = rs.getString("Number");
+                String patientID = rs.getString("Patient_ID");
+                String idType = rs.getString("ID_Type");
+                String idNumber = rs.getString("ID");
                 String name = rs.getString("Name");
                 String gender = rs.getString("Gender");
                 String room = rs.getString("Room");
@@ -90,8 +104,15 @@ public class PATIENT_INFO extends JFrame implements ActionListener {
                 String mobile = rs.getString("Mobile_Number");
                 String deposit = rs.getString("Deposit");
 
-                model.addRow(new Object[]{id, number, name, gender, room, time, mobile, deposit});
+                model.addRow(new Object[]{
+                        patientID, idType, idNumber, name, gender, room, time, mobile, deposit
+                });
             }
+
+            rs.close();
+            c.statement.close();
+            c.connection.close();
+
         } catch (Exception e) {
             e.printStackTrace();
             JOptionPane.showMessageDialog(this, "Error loading data: " + e.getMessage());
