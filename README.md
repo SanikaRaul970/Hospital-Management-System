@@ -106,23 +106,46 @@ Reception Dashboard	Main menu to access all modules
 New Patient Form	Add new patients and assign rooms
 Patient Info	Display all patient records
 Billing Window	Handle patient billing and free rooms
-<img width="800" height="506" alt="image" src="https://github.com/user-attachments/assets/f7c04f88-55be-4990-8d53-13a2bcebf3b1" />
-<img width="1425" height="749" alt="image" src="https://github.com/user-attachments/assets/0642284e-af26-4aa6-85fb-1c5e4e132609" />
-<img width="867" height="575" alt="image" src="https://github.com/user-attachments/assets/79c6c48f-3f16-4a67-827d-12edc728361b" />
-<img width="1425" height="695" alt="image" src="https://github.com/user-attachments/assets/47a7d5ee-25b7-4571-95e7-6b4c22bb836d" />
-<img width="872" height="523" alt="image" src="https://github.com/user-attachments/assets/276e567f-2cab-47e4-b243-136620dc8b41" />
-<img width="870" height="484" alt="image" src="https://github.com/user-attachments/assets/7a496154-bf74-499a-bec2-d438c369648f" />
-<img width="1405" height="699" alt="image" src="https://github.com/user-attachments/assets/85c6d75f-7a5c-4639-9cff-2cd138dc2c22" />
-<img width="976" height="633" alt="image" src="https://github.com/user-attachments/assets/dbf239e4-d888-4b28-950b-6429aa2816e6" />
 
-💡 Future Enhancements
 
-Add Doctor and Staff management.
+## 🖼️ Application Screenshots
 
-Generate printable PDF bills and reports.
+### 🔐 Login
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/fcb21cf3-68cc-4d53-9ada-cf3e121617b4" width="600">
+</p>
 
-Add search and filter options for patients.
+### 🏠 Reception
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/179eaf05-8687-433b-a5f7-0eb1015524de" width="800">
+</p>
 
-Implement multi-user roles (Admin, Receptionist, Doctor).
+### ➕ Add New Patient
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/79c6c48f-3f16-4a67-827d-12edc728361b" width="800">
+</p>
 
-Integrate email/SMS notifications for discharge updates.
+### 📋 View Patient Information
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/47a7d5ee-25b7-4571-95e7-6b4c22bb836d" width="800">
+</p>
+
+### 🏥 Department
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/276e567f-2cab-47e4-b243-136620dc8b41" width="700">
+</p>
+
+### 👨‍⚕️ Doctors
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/7a496154-bf74-499a-bec2-d438c369648f" width="700">
+</p>
+
+### 🚪 Room Management
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/85c6d75f-7a5c-4639-9cff-2cd138dc2c22" width="800">
+</p>
+
+### 👷 Employee Details
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/dbf239e4-d888-4b28-950b-6429aa2816e6" width="800">
+</p>
