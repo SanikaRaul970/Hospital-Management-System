@@ -2,40 +2,33 @@ The Hospital Management System (HMS) is a desktop-based Java application built u
 It streamlines hospital operations such as patient management, room allocation, billing, and record tracking, providing a simple yet effective interface for hospital receptionists and administrators.
 
 🚀 Features
+
 👤 Patient Management
 
 Add new patients with essential details (Name, Gender, Contact, Room, Deposit, etc.)
-
 Display all patient information in a table format.
-
 Update or remove patient details if required.
 
 🏠 Room Management
 
 Automatically allocate available rooms to new patients.
-
 View room availability status.
-
 Free up rooms once a patient is discharged after billing.
 
 💳 Billing System
 
 Calculate total charges based on patient stay duration and room cost.
-
 Generate and display patient bills.
-
 Automatically free the assigned room after billing is completed.
 
 🔐 Login System
 
 Secure login authentication for reception/admin users.
-
 Credentials stored securely in the MySQL database.
 
 📊 Database Management
 
 All records (patients, rooms, billing, login) are stored and retrieved from MySQL.
-
 Supports real-time data refresh to ensure accuracy.
 
 🧱 Tech Stack
