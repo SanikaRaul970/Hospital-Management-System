@@ -106,7 +106,7 @@ Reception Dashboard	Main menu to access all modules
 New Patient Form	Add new patients and assign rooms
 Patient Info	Display all patient records
 Billing Window	Handle patient billing and free rooms
-<img width="471" height="386" alt="image" src="https://github.com/user-attachments/assets/2b39842e-c939-4b4f-9d6d-c0acec4db256" />
+<img width="800" height="506" alt="image" src="https://github.com/user-attachments/assets/f7c04f88-55be-4990-8d53-13a2bcebf3b1" />
 <img width="1425" height="749" alt="image" src="https://github.com/user-attachments/assets/0642284e-af26-4aa6-85fb-1c5e4e132609" />
 <img width="867" height="575" alt="image" src="https://github.com/user-attachments/assets/79c6c48f-3f16-4a67-827d-12edc728361b" />
 <img width="1425" height="695" alt="image" src="https://github.com/user-attachments/assets/47a7d5ee-25b7-4571-95e7-6b4c22bb836d" />
