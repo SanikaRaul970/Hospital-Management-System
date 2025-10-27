@@ -1,6 +1,8 @@
 package hospital.management.system;
 
 import javax.swing.*;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.math.BigDecimal;
@@ -43,7 +45,22 @@ public class BillingWindow extends JFrame {
         JScrollPane scrollPane = new JScrollPane(table);
         add(scrollPane, BorderLayout.CENTER);
 
+        // ===== FETCH DATA =====
         fetchBillingData();
+
+        // ===== AUTO TOTAL CALCULATION =====
+        model.addTableModelListener(new TableModelListener() {
+            @Override
+            public void tableChanged(TableModelEvent e) {
+                int row = e.getFirstRow();
+                int column = e.getColumn();
+
+                // When Deposit or Additional Charges are changed, recalculate
+                if (column == 3 || column == 4) {
+                    recalculateRowTotal(row);
+                }
+            }
+        });
 
         // ===== BUTTON PANEL =====
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 25, 15));
@@ -54,7 +71,7 @@ public class BillingWindow extends JFrame {
 
         JButton completeBtn = new JButton("Complete Billing");
         styleButton(completeBtn);
-        completeBtn.addActionListener(e -> completeBilling());
+        completeBtn.addActionListener(e -> completeSelectedBilling());
 
         JButton freeRoomBtn = new JButton("Free Room");
         styleButton(freeRoomBtn);
@@ -77,7 +94,7 @@ public class BillingWindow extends JFrame {
         setVisible(true);
     }
 
-    // ===== BUTTON STYLE METHOD =====
+    // ===== BUTTON STYLE =====
     private void styleButton(JButton btn) {
         btn.setFont(new Font("Segoe UI", Font.BOLD, 16));
         btn.setBackground(new Color(42, 157, 143));
@@ -100,10 +117,10 @@ public class BillingWindow extends JFrame {
     private void fetchBillingData() {
         try {
             conn c = new conn();
-            String query = "SELECT ID, Name, Room, Deposit FROM patient_info";
+            String query = "SELECT ID, Name, Room, Deposit, Additional_Charges, Total_Amount, Billing_Status FROM patient_info";
             ResultSet rs = c.statement.executeQuery(query);
 
-            model.setRowCount(0); // clear table before loading
+            model.setRowCount(0);
 
             while (rs.next()) {
                 Object[] row = new Object[7];
@@ -111,70 +128,98 @@ public class BillingWindow extends JFrame {
                 row[1] = rs.getString("Name");
                 row[2] = rs.getString("Room");
                 row[3] = rs.getBigDecimal("Deposit");
-                row[4] = BigDecimal.ZERO; // additional charges
-                row[5] = rs.getBigDecimal("Deposit"); // total = deposit + additional
-                row[6] = "Pending"; // billing status
+                row[4] = rs.getBigDecimal("Additional_Charges");
+                row[5] = rs.getBigDecimal("Total_Amount");
+                row[6] = rs.getString("Billing_Status");
                 model.addRow(row);
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
             JOptionPane.showMessageDialog(null, "Error fetching billing data: " + e.getMessage());
         }
     }
 
-    // ===== UPDATE BILLING VALUES =====
+    // ===== AUTO RECALCULATE TOTAL =====
+    private void recalculateRowTotal(int row) {
+        try {
+            if (row < 0 || row >= table.getRowCount()) return;
+
+            BigDecimal deposit = safeBigDecimal(table.getValueAt(row, 3));
+            BigDecimal additional = safeBigDecimal(table.getValueAt(row, 4));
+            BigDecimal total = deposit.add(additional);
+
+            table.setValueAt(total, row, 5);
+
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(null, "Invalid number entered. Please enter numeric values only.");
+        }
+    }
+
+    private BigDecimal safeBigDecimal(Object value) {
+        if (value == null || value.toString().trim().isEmpty()) return BigDecimal.ZERO;
+        return new BigDecimal(value.toString());
+    }
+
+    // ===== SAVE BILLING CHANGES =====
     private void saveBillingChanges(boolean showMessageOnly) {
         try {
             conn c = new conn();
 
             for (int i = 0; i < table.getRowCount(); i++) {
                 String id = table.getValueAt(i, 0).toString();
-                BigDecimal deposit = new BigDecimal(table.getValueAt(i, 3).toString());
-                BigDecimal additional = new BigDecimal(table.getValueAt(i, 4).toString());
+                BigDecimal deposit = safeBigDecimal(table.getValueAt(i, 3));
+                BigDecimal additional = safeBigDecimal(table.getValueAt(i, 4));
                 BigDecimal total = deposit.add(additional);
                 table.setValueAt(total, i, 5);
 
-                String query = "UPDATE patient_info SET Deposit = ? WHERE ID = ?";
+                String query = "UPDATE patient_info SET Deposit = ?, Additional_Charges = ?, Total_Amount = ?, Billing_Status = ? WHERE ID = ?";
                 PreparedStatement pst = c.connection.prepareStatement(query);
                 pst.setBigDecimal(1, deposit);
-                pst.setString(2, id);
+                pst.setBigDecimal(2, additional);
+                pst.setBigDecimal(3, total);
+                pst.setString(4, table.getValueAt(i, 6).toString());
+                pst.setString(5, id);
                 pst.executeUpdate();
             }
 
-            if (!showMessageOnly) {
+            if (!showMessageOnly)
                 JOptionPane.showMessageDialog(null, "Billing updated successfully!");
-            }
 
         } catch (Exception e) {
-            e.printStackTrace();
             JOptionPane.showMessageDialog(null, "Error updating billing: " + e.getMessage());
         }
     }
 
-    // ===== COMPLETE BILLING =====
-    private void completeBilling() {
-        saveBillingChanges(true); // Save any recent edits first
+    // ===== COMPLETE SELECTED BILLING =====
+    private void completeSelectedBilling() {
+        int selectedRow = table.getSelectedRow();
+
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(null, "Please select a patient to complete billing.");
+            return;
+        }
+
+        saveBillingChanges(true);
+
+        String id = table.getValueAt(selectedRow, 0).toString();
 
         try {
             conn c = new conn();
+            String updateStatus = "UPDATE patient_info SET Billing_Status = 'Completed' WHERE ID = ?";
+            PreparedStatement pst = c.connection.prepareStatement(updateStatus);
+            pst.setString(1, id);
+            pst.executeUpdate();
 
-            for (int i = 0; i < table.getRowCount(); i++) {
-                String id = table.getValueAt(i, 0).toString();
+            table.setValueAt("Completed", selectedRow, 6);
 
-                // Mark billing status as completed
-                table.setValueAt("Completed", i, 6);
-            }
-
-            JOptionPane.showMessageDialog(null, "Billing completed! You can now free the room if required.");
+            JOptionPane.showMessageDialog(null, "Billing completed for patient ID: " + id);
 
         } catch (Exception e) {
-            e.printStackTrace();
             JOptionPane.showMessageDialog(null, "Error completing billing: " + e.getMessage());
         }
     }
 
-    // ===== FREE SELECTED ROOM =====
+    // ===== FREE ROOM (HISTORY KEPT) =====
     private void freeSelectedRoom() {
         int selectedRow = table.getSelectedRow();
 
@@ -184,21 +229,21 @@ public class BillingWindow extends JFrame {
         }
 
         String id = table.getValueAt(selectedRow, 0).toString();
+        String roomNumber = table.getValueAt(selectedRow, 2).toString();
 
         try {
             conn c = new conn();
-            String query = "UPDATE patient_info SET Room = NULL WHERE ID = ?";
+
+            // Keep room number for history, just mark it available
+            String query = "UPDATE room SET Availability = 'Available' WHERE Room_No = ?";
             PreparedStatement pst = c.connection.prepareStatement(query);
-            pst.setString(1, id);
+            pst.setString(1, roomNumber);
             pst.executeUpdate();
 
-            table.setValueAt(null, selectedRow, 2); // Clear room in table
-            table.setValueAt("Completed", selectedRow, 6); // Ensure status shows completed
-
-            JOptionPane.showMessageDialog(null, "Room freed successfully!");
+            JOptionPane.showMessageDialog(null,
+                    "Room " + roomNumber + " is now available.\nPatient history retained.");
 
         } catch (Exception e) {
-            e.printStackTrace();
             JOptionPane.showMessageDialog(null, "Error freeing room: " + e.getMessage());
         }
     }
