@@ -128,6 +128,31 @@ public class Reception extends JFrame {
                         new View_Room();
                         setVisible(false);
                         break;
+                    case "Department":
+                        new Department();
+                        setVisible(false);
+                        break;
+
+                    case "Book Appointment":
+                        new Book_Appointment();
+                        setVisible(false);
+                        break;
+
+                    case "View Doctors":
+                        new View_Doctor();
+                        setVisible(false);
+                        break;
+
+                    case "Discharge Summary":
+                        new Discharge_Summary();
+                        setVisible(false);
+                        break;
+
+                    case "View All Employees":
+                        new View_Employee();
+                        setVisible(false);
+                        break;
+
 
                     case "Logout":
                         dispose();
