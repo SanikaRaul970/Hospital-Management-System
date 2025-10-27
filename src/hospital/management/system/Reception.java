@@ -36,8 +36,6 @@ public class Reception extends JFrame {
         ambulanceImage.setBounds(1220, 25, 200, 100);
         headerPanel.add(ambulanceImage);
 
-
-
         // ===== MAIN PANEL =====
         JPanel mainPanel = new JPanel(null);
         mainPanel.setBounds(0, 150, 1455, 618);
@@ -69,7 +67,6 @@ public class Reception extends JFrame {
         int totalHeight = ((int) Math.ceil(buttonNames.length / (double) buttonsPerRow)) * buttonHeight
                 + (((int) Math.ceil(buttonNames.length / (double) buttonsPerRow)) - 1) * vGap;
 
-        // Calculate starting point to center the grid
         int startX = (mainPanel.getWidth() - totalWidth) / 2;
         int startY = (mainPanel.getHeight() - totalHeight) / 2 + 40;
 
@@ -109,13 +106,13 @@ public class Reception extends JFrame {
                         break;
 
                     case "View Patients":
-                    case "Patient Info":   // Both open the same patient view
-                        new View_Patient();
+                    case "Update Patient Info":
+                        new Update_Patient(); // your update class
                         setVisible(false);
                         break;
 
-                    case "Update Patient Info":
-                        new Update_Patient(); // You need to create this class
+                    case "Patient Info": // ✅ FIXED — now opens the correct window
+                        new PATIENT_INFO();
                         setVisible(false);
                         break;
 
@@ -128,6 +125,7 @@ public class Reception extends JFrame {
                         new View_Room();
                         setVisible(false);
                         break;
+
                     case "Department":
                         new Department();
                         setVisible(false);
@@ -153,18 +151,15 @@ public class Reception extends JFrame {
                         setVisible(false);
                         break;
 
-
                     case "Logout":
                         dispose();
                         JOptionPane.showMessageDialog(null, "Logged out successfully!");
                         break;
 
-                    // Add other buttons here as needed
                     default:
                         JOptionPane.showMessageDialog(null, btnText + " is not implemented yet.");
                 }
             });
-
 
             mainPanel.add(btn);
             count++;
@@ -179,7 +174,7 @@ public class Reception extends JFrame {
         setTitle("Hospital Management System - Reception Dashboard");
         setSize(1455, 768);
         setLayout(null);
-        setLocationRelativeTo(null); // center on screen
+        setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setResizable(false);
         setVisible(true);

@@ -13,7 +13,7 @@ public class NEW_PATIENT extends JFrame implements ActionListener {
     JTextField txtNumber, txtName, txtMobile, txtDeposit;
     JRadioButton male, female;
     JLabel lblTime;
-    JButton btnAdd, btnCancel;
+    JButton btnAdd, btnCancel, btnBack;
 
     NEW_PATIENT() {
 
@@ -185,10 +185,17 @@ public class NEW_PATIENT extends JFrame implements ActionListener {
         styleButton(btnCancel);
         formPanel.add(btnCancel);
 
+        btnBack = new JButton("Back to Reception");
+        btnBack.setBounds(220, y + 60, 200, 35);
+        styleButton(btnBack);
+        formPanel.add(btnBack);
+
         btnAdd.addActionListener(this);
         btnCancel.addActionListener(this);
+        btnBack.addActionListener(this);
 
-        formPanel.setPreferredSize(new Dimension(580, y + 100));
+        // ✅ Important for scroll to work
+        formPanel.setPreferredSize(new Dimension(580, y + 180));
 
         // ===== FRAME SETTINGS =====
         setTitle("Hospital Management System - New Patient");
@@ -265,9 +272,27 @@ public class NEW_PATIENT extends JFrame implements ActionListener {
             }
 
         } else if (e.getSource() == btnCancel) {
+            // ✅ Clear form only
+            clearForm();
+
+        } else if (e.getSource() == btnBack) {
+            // ✅ Go back to Reception
             setVisible(false);
             new Reception();
         }
+    }
+
+    // ✅ Clear all input fields
+    private void clearForm() {
+        comboID.setSelectedIndex(0);
+        txtNumber.setText("");
+        txtName.setText("");
+        male.setSelected(false);
+        female.setSelected(false);
+        comboRoom.setSelectedIndex(0);
+        lblTime.setText(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+        txtMobile.setText("");
+        txtDeposit.setText("");
     }
 
     public static void main(String[] args) {
