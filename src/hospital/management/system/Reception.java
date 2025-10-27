@@ -50,19 +50,19 @@ public class Reception extends JFrame {
 
         // ===== BUTTON GRID =====
         String[] buttonNames = {
-                "Add Patient", "View Patients", "Update Patient Info",
-                "Patient Info", "Department", "Book Appointment",
-                "Check Room Availability", "View Doctors", "Discharge Summary",
-                "Billing", "View All Employees", "Logout"
+                "Add Patient", "View Patients",
+                "Patient Info", "Department",
+                "Book Appointment", "Check Room Availability",
+                "View Doctors", "Billing", "View All Employees",
+                "Logout"
         };
 
         int buttonWidth = 250;
         int buttonHeight = 55;
-        int hGap = 70; // horizontal gap
-        int vGap = 30; // vertical gap
+        int hGap = 70;
+        int vGap = 30;
         int buttonsPerRow = 3;
 
-        // Calculate total grid width and height
         int totalWidth = buttonsPerRow * buttonWidth + (buttonsPerRow - 1) * hGap;
         int totalHeight = ((int) Math.ceil(buttonNames.length / (double) buttonsPerRow)) * buttonHeight
                 + (((int) Math.ceil(buttonNames.length / (double) buttonsPerRow)) - 1) * vGap;
@@ -106,12 +106,7 @@ public class Reception extends JFrame {
                         break;
 
                     case "View Patients":
-                    case "Update Patient Info":
-                        new Update_Patient(); // your update class
-                        setVisible(false);
-                        break;
-
-                    case "Patient Info": // ✅ FIXED — now opens the correct window
+                    case "Patient Info":
                         new PATIENT_INFO();
                         setVisible(false);
                         break;
@@ -141,11 +136,6 @@ public class Reception extends JFrame {
                         setVisible(false);
                         break;
 
-                    case "Discharge Summary":
-                        new Discharge_Summary();
-                        setVisible(false);
-                        break;
-
                     case "View All Employees":
                         new View_Employee();
                         setVisible(false);
@@ -154,6 +144,7 @@ public class Reception extends JFrame {
                     case "Logout":
                         dispose();
                         JOptionPane.showMessageDialog(null, "Logged out successfully!");
+                        new Login(); // redirect to Login page
                         break;
 
                     default:

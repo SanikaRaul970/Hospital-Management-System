@@ -12,7 +12,7 @@ import java.util.List;
 public class View_Room extends JFrame implements ActionListener {
 
     JTable table;
-    JButton backButton, refreshButton;
+    JButton backButton, refreshButton, freeAllButton;
     String[] columnNames = {"Room Number", "Availability", "Status", "Price"};
 
     View_Room() {
@@ -49,13 +49,7 @@ public class View_Room extends JFrame implements ActionListener {
         table.setFont(new Font("Segoe UI", Font.PLAIN, 15));
         table.setRowHeight(28);
         table.setEnabled(false);
-        table.setAutoCreateRowSorter(true); // sortable table
-
-        // Set column widths
-        table.getColumnModel().getColumn(0).setPreferredWidth(100);
-        table.getColumnModel().getColumn(1).setPreferredWidth(100);
-        table.getColumnModel().getColumn(2).setPreferredWidth(120);
-        table.getColumnModel().getColumn(3).setPreferredWidth(80);
+        table.setAutoCreateRowSorter(true);
 
         // Color-coded rows
         table.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
@@ -64,11 +58,11 @@ public class View_Room extends JFrame implements ActionListener {
                                                            boolean isSelected, boolean hasFocus,
                                                            int row, int column) {
                 Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-                String avail = (String) table.getValueAt(row, 1); // Availability column
-                if ("Available".equals(avail)) {
-                    c.setBackground(new Color(198, 239, 206)); // light green
+                String avail = (String) table.getValueAt(row, 1);
+                if ("Available".equalsIgnoreCase(avail)) {
+                    c.setBackground(new Color(198, 239, 206));
                 } else {
-                    c.setBackground(new Color(255, 199, 206)); // light red
+                    c.setBackground(new Color(255, 199, 206));
                 }
                 return c;
             }
@@ -80,17 +74,24 @@ public class View_Room extends JFrame implements ActionListener {
 
         // ===== BACK BUTTON =====
         backButton = new JButton("Back to Reception");
-        backButton.setBounds(650, 500, 180, 40);
+        backButton.setBounds(580, 500, 180, 40);
         styleButton(backButton);
         mainPanel.add(backButton);
         backButton.addActionListener(this);
 
         // ===== REFRESH BUTTON =====
         refreshButton = new JButton("Refresh");
-        refreshButton.setBounds(840, 500, 120, 40);
+        refreshButton.setBounds(780, 500, 120, 40);
         styleButton(refreshButton);
         mainPanel.add(refreshButton);
         refreshButton.addActionListener(e -> refreshTable());
+
+        // ===== FREE ALL ROOMS BUTTON =====
+        freeAllButton = new JButton("Free All Rooms");
+        freeAllButton.setBounds(920, 500, 160, 40);
+        styleButton(freeAllButton);
+        mainPanel.add(freeAllButton);
+        freeAllButton.addActionListener(e -> freeAllRooms());
 
         // ===== FRAME SETTINGS =====
         setTitle("Hospital Management System - Room Availability");
@@ -102,6 +103,7 @@ public class View_Room extends JFrame implements ActionListener {
         setVisible(true);
     }
 
+    // ===== FETCH ROOM DATA =====
     private Object[][] fetchRoomData() {
         try {
             conn c = new conn();
@@ -112,9 +114,8 @@ public class View_Room extends JFrame implements ActionListener {
             while (rs.next()) {
                 String roomNo = rs.getString("room_no");
                 String avail = rs.getString("availability");
-                String status = avail.equals("Available") ? "✅ Free" : "❌ Occupied";
+                String status = avail.equalsIgnoreCase("Available") ? "✅ Free" : "❌ Occupied";
                 String price = rs.getString("price");
-
                 list.add(new Object[]{roomNo, avail, status, price});
             }
 
@@ -132,11 +133,34 @@ public class View_Room extends JFrame implements ActionListener {
         }
     }
 
+    // ===== REFRESH TABLE =====
     private void refreshTable() {
         Object[][] newData = fetchRoomData();
         table.setModel(new DefaultTableModel(newData, columnNames));
     }
 
+    // ===== FREE ALL ROOMS =====
+    private void freeAllRooms() {
+        int confirm = JOptionPane.showConfirmDialog(this,
+                "Are you sure you want to free all rooms?",
+                "Confirm Action", JOptionPane.YES_NO_OPTION);
+        if (confirm == JOptionPane.YES_OPTION) {
+            try {
+                conn c = new conn();
+                String query = "UPDATE room SET availability = 'Available'";
+                c.statement.executeUpdate(query);
+
+                JOptionPane.showMessageDialog(this, "✅ All rooms have been freed successfully!");
+                refreshTable();
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Error freeing rooms: " + e.getMessage());
+            }
+        }
+    }
+
+    // ===== STYLE BUTTON =====
     private void styleButton(JButton button) {
         button.setFont(new Font("Segoe UI", Font.BOLD, 14));
         button.setBackground(new Color(42, 157, 143));
@@ -149,7 +173,6 @@ public class View_Room extends JFrame implements ActionListener {
             public void mouseEntered(MouseEvent evt) {
                 button.setBackground(new Color(25, 111, 101));
             }
-
             public void mouseExited(MouseEvent evt) {
                 button.setBackground(new Color(42, 157, 143));
             }

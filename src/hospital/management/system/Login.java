@@ -20,7 +20,7 @@ public class Login extends JFrame implements ActionListener {
         setLocationRelativeTo(null);
         setLayout(null);
 
-        getContentPane().setBackground(new Color(227, 242, 253)); // light blue
+        getContentPane().setBackground(new Color(227, 242, 253)); // light blue background
 
         JPanel loginPanel = new JPanel();
         loginPanel.setLayout(null);
@@ -99,8 +99,8 @@ public class Login extends JFrame implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == loginButton) {
-            String user = usernameField.getText();
-            String pass = new String(passwordField.getPassword());
+            String user = usernameField.getText().trim();
+            String pass = new String(passwordField.getPassword()).trim();
 
             if (user.isEmpty() || pass.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "Please enter both username and password.");
@@ -117,8 +117,8 @@ public class Login extends JFrame implements ActionListener {
 
                 if (rs.next()) {
                     JOptionPane.showMessageDialog(this, "Login Successful!");
-                    new Reception(); // Open Reception window
                     setVisible(false);
+                    new Reception(); // redirect to Reception
                 } else {
                     JOptionPane.showMessageDialog(this, "Invalid Credentials", "Error", JOptionPane.ERROR_MESSAGE);
                 }
@@ -135,9 +135,8 @@ public class Login extends JFrame implements ActionListener {
             System.exit(0);
 
         } else if (e.getSource() == registerButton) {
-            // Open registration window
-            new Register(); // You need to create Register.java
-            setVisible(false);
+            // You can implement registration later
+            JOptionPane.showMessageDialog(this, "Registration feature coming soon!");
         }
     }
 
